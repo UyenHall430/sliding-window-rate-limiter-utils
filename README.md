@@ -36,3 +36,10 @@ The trade-off is memory: every event within the window is kept as a timestamp. I
 The window is a **half-open interval** `[now - windowMs, now]`. An event recorded at `t=0` is still counted at `t=windowMs` exactly, and only falls out at `t=windowMs + 1` (the first tick strictly past the window). If you need `now - windowMs` to be an exclusive lower bound, adjust `windowMs` by one millisecond when you construct the limiter — the library will not silently shift boundaries for you.
 
 Time is injected via the `now` constructor option. Default is `Date.now`. This exists so tests can be deterministic; pass your own clock in production only if you have a reason to.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
